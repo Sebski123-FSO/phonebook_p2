@@ -1,25 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import personService from "./services/persons";
+import Persons from "./components/Persons";
+import PersonForm from "./components/PersonForm";
+import Notification from "./components/Notification";
+import Filter from "./components/Filter";
 
-function App() {
+const App = () => {
+  const [persons, setPersons] = useState([]);
+  const [newName, setNewName] = useState("");
+  const [newNumber, setnewNumber] = useState("");
+  const [filter, setFilter] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState(null);
+
+  useEffect(() => {
+    personService.getAll().then((allPersons) => {
+      setPersons(allPersons);
+    });
+  }, []);
+
+  const notification = (message, isError = false) => {
+    setNotificationMessage(`${message}${isError ? "_msg_is_err" : ""}`);
+    setTimeout(() => {
+      setNotificationMessage(null);
+    }, 3000);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Phonebook</h1>
+      <Notification message={notificationMessage} />
+      <Filter setFilter={setFilter}></Filter>
+      <h2>add a new</h2>
+      <PersonForm persons={persons} setPersons={setPersons} newName={newName} setNewName={setNewName} newNumber={newNumber} setnewNumber={setnewNumber} notification={notification}></PersonForm>
+      <h2>Numbers</h2>
+      <Persons persons={persons} filter={filter} setPersons={setPersons}></Persons>
     </div>
   );
-}
+};
 
 export default App;
